@@ -31,7 +31,7 @@ def get_descriptors(theImage,num_max_fea):
    	# gsImage=cv2.cvtColor(curImage,cv2.COLOR_BGR2GRAY) # convert image to gray scale
 	#plt.figure()
 	#plt.imshow(gsImage) # shows image
-    theSIFT=cv2.xfeatures2d.SIFT_create((num_max_fea-3)) # creates a object type SIFT 
+    theSIFT=cv2.SIFT_create((num_max_fea-3)) # creates a object type SIFT 
     keyPoints,theDescriptors=theSIFT.detectAndCompute(gsImage,None) # keypoint detection and descriptors descriptors, sense mascara
    # img=cv2.drawKeypoints(gsImage,keyPoints,curImage,flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS) # uncomment in case you want to see the keypoints
    # plt.figure()
@@ -86,8 +86,8 @@ def get_descriptors(theImage,num_max_fea):
 
 
 #############################################################3
-qPath='/home/xesc/RECERCA/SUMMUM/CNN/netvlad-master/img_datasets/valldemossa/queries_75_566/' # write here the global path of your queries
-dBPath='/home/xesc/RECERCA/SUMMUM/CNN/netvlad-master/img_datasets/valldemossa/Dbase_75_566/' # write here the global path of the corresponding database of images
+qPath='/home/fabio/NetHALOC/NetHALOC_Keras_Python/DATASETS/QUERY/' # write here the global path of your queries
+dBPath='/home/fabio/NetHALOC/NetHALOC_Keras_Python/DATASETS/DATABASE/' # write here the global path of the corresponding database of images
 num_max_features=100 # define the maximum number of features
 
  # get the 3 orthogonal unitary vectors
@@ -140,7 +140,7 @@ print(np.linalg.norm(vector1), np.linalg.norm(vector2), np.linalg.norm(vector3))
 print(np.dot(vector1, vector2) , np.dot(vector3, vector2) , np.dot(vector1, vector3))
 
 #select one query
-query_image=os.path.join(qPath,'153_85.jpg') # the global  path of the query image
+query_image=os.path.join(qPath,'4.jpg') # the global  path of the query image
 hash_query=get_descriptors(query_image,num_max_features) # get the query hash
 
 allFiles=[x for x in os.listdir(dBPath) if x.upper().endswith('.JPG')] ## list of images of the db directory. Assume that all are JPG, change if they are png or others
