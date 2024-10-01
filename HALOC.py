@@ -19,9 +19,11 @@ import os # utility for access to directories.
 
 
 
-def imshow(openCVImage):
+def imshow(theImage):
     plt.figure()
-    plt.imshow(cv2.cvtColor(openCVImage,cv2.COLOR_BGR2RGB))
+    img = cv2.imread(theImage,cv2.IMREAD_COLOR)
+    plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    plt.show()
     
 
 def get_descriptors(theImage,num_max_fea):
@@ -29,13 +31,15 @@ def get_descriptors(theImage,num_max_fea):
     gsImage=cv2.imread(theImage,cv2.IMREAD_GRAYSCALE) # read the image "theImage" from the hard disc in gray scale and loads it as a OpenCV CvMat structure. 
   
    	# gsImage=cv2.cvtColor(curImage,cv2.COLOR_BGR2GRAY) # convert image to gray scale
-	#plt.figure()
-	#plt.imshow(gsImage) # shows image
+    # plt.figure()
+    # plt.imshow(gsImage) # shows image
+    # plt.show()
     theSIFT=cv2.SIFT_create((num_max_fea-3)) # creates a object type SIFT 
     keyPoints,theDescriptors=theSIFT.detectAndCompute(gsImage,None) # keypoint detection and descriptors descriptors, sense mascara
-   # img=cv2.drawKeypoints(gsImage,keyPoints,curImage,flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS) # uncomment in case you want to see the keypoints
-   # plt.figure()
-   # plt.imshow(img)
+    img = cv2.drawKeypoints(gsImage,keyPoints,None,flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS) # uncomment in case you want to see the keypoints
+    # plt.figure()
+    # plt.imshow(img)
+    # plt.show()
     nbr_of_keypoints=len(keyPoints)
     # sanity checks: 
     if nbr_of_keypoints==0:
@@ -47,7 +51,9 @@ def get_descriptors(theImage,num_max_fea):
 
     num_of_descriptors=theDescriptors.shape[0] #--> 100
     num_of_components=theDescriptors.shape[1] # --> 128
-    hash=[]
+    hash=[] # initilize hash
+
+    # initialize auxiliar variables
     dot = 0
     dot_normalized=0
     suma = 0
@@ -141,6 +147,7 @@ print(np.dot(vector1, vector2) , np.dot(vector3, vector2) , np.dot(vector1, vect
 
 #select one query
 query_image=os.path.join(qPath,'4.jpg') # the global  path of the query image
+imshow(query_image)
 hash_query=get_descriptors(query_image,num_max_features) # get the query hash
 
 allFiles=[x for x in os.listdir(dBPath) if x.upper().endswith('.JPG')] ## list of images of the db directory. Assume that all are JPG, change if they are png or others
@@ -149,12 +156,12 @@ allFiles=[x for x in os.listdir(dBPath) if x.upper().endswith('.JPG')] ## list o
 distance_matrix=np.zeros((0,2),dtype='S20, f4')
 
 
-for i in range(len(allFiles)): # fron 0 to len(allFiles)-1 --> search for all images in the database
-    candidate_image=os.path.join(dBPath,allFiles[i]) # get candidate
-    hash_candidate= get_descriptors(candidate_image,num_max_features) # get hash of candidate
-    dist = np.linalg.norm((hash_candidate-hash_query), ord=1) # compute l1 norm between hashes
-    distance_matrix = np.append(distance_matrix, np.array([(allFiles[i], dist)], dtype='S20, f4')) # append candidate names and distances into a matrix
+# for i in range(len(allFiles)): # fron 0 to len(allFiles)-1 --> search for all images in the database
+#     candidate_image=os.path.join(dBPath,allFiles[i]) # get candidate
+#     hash_candidate= get_descriptors(candidate_image,num_max_features) # get hash of candidate
+#     dist = np.linalg.norm((hash_candidate-hash_query), ord=1) # compute l1 norm between hashes
+#     distance_matrix = np.append(distance_matrix, np.array([(allFiles[i], dist)], dtype='S20, f4')) # append candidate names and distances into a matrix
     
 
-np.sort(distance_matrix.view('S20,f4'), order=['f1'], axis=0) # The sort matrix of distances by distances. This is the list of images in the database with the distance between the query hash and the 
+# np.sort(distance_matrix.view('S20,f4'), order=['f1'], axis=0) # The sort matrix of distances by distances. This is the list of images in the database with the distance between the query hash and the 
 # database image hash.
