@@ -18,31 +18,62 @@ import os # utility for access to directories.
 from dataset import DataSet # import the Dataset management class 
 from descriptorgenerator import HALOCGenerator
 
-
-
-def imshow(theImage):
-    plt.figure()
-    img = cv2.imread(theImage,cv2.IMREAD_COLOR)
-    plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
-    plt.show()
-    
-
-#############################################################3
+#############################################################
 qPath='/home/fabio/NetHALOC/HALOC/HALOC_Python/DATASETS/QUERY/' # write here the global path of your queries
-dBPath='/home/fabio/NetHALOC/HALOC/DATASETS/HALOC_Python/DATABASE/' # write here the global path of the corresponding database of images
+dBPath='/home/fabio/NetHALOC/HALOC/HALOC_Python/DATASETS/DATABASE/' # write here the global path of the corresponding database of images
+
+print('********** LOADING DATASET ***********')
+dataSet1=DataSet('DATASETS/DATASET1.TXT')
 
 num_max_features = 100 # define the maximum number of features
+imgSize = (240,320)    # define size images
+queryIndex= 5
+
 Haloc= HALOCGenerator(num_max_features); #create an Haloc object (define the orthogonal vectors to projections)
 
 #select one query
-query_image=os.path.join(qPath,'4.jpg') # the global  path of the query image
-imshow(query_image)
-hash_query=Haloc.get_descriptors(query_image) # get the query hash
+query_image, qFileName = dataSet1.get_qimage(queryIndex) # the global  path of the query image
+dataFields = qFileName.split('/')
+qshortName = dataFields[-1]
+plt.imshow(query_image)
+plt.title('QUERY')
+plt.show()
 
-allFiles=[x for x in os.listdir(dBPath) if x.upper().endswith('.JPG')] ## list of images of the db directory. Assume that all are JPG, change if they are png or others
+hash_query = Haloc.get_descriptors(qFileName) # get the query hash
 
+# allFiles=[x for x in os.listdir(dBPath) if x.upper().endswith('.JPG')] ## list of images of the db directory. Assume that all are JPG, change if they are png or others
 
+# Get the database image index that actually close loop with the used query.
+actualLoops=dataSet1.get_qloop(queryIndex)
 distance_matrix=np.zeros((0,2),dtype='S20, f4')
+
+plt.figure()
+plt.title('ACTUAL LOOPS')
+print("\n Distances:")
+for i in range(len(actualLoops)):
+    loop_image, lFileName = dataSet1.get_dbimage(actualLoops[i])
+    hash_loop = Haloc.get_descriptors(lFileName) # get the query hash
+    dist = np.linalg.norm((hash_loop-hash_query), ord=1) # compute l1 norm between hashes
+    dataFields = lFileName.split('/')
+    lshortName = dataFields[-1]
+    distance_matrix = np.append(distance_matrix, np.array([(lshortName, dist)], dtype='S20, f4'))
+    plt.subplot(1,2,i+1)
+    plt.imshow(loop_image)
+    print('l1-norm between '+ lFileName +' and '+ qshortName + '= ' +str(dist))
+plt.show()
+
+nLoopIndex = 12
+
+plt.figure()
+plt.title('NOT LOOP')
+nloop_image, nlFileName = dataSet1.get_dbimage(nLoopIndex)
+hash_nloop = Haloc.get_descriptors(nlFileName) # get the query hash
+dist = np.linalg.norm((hash_nloop-hash_query), ord=1) # compute l1 norm between hashes
+print('l1-norm between '+ nlFileName +' and '+ qshortName + '= ' +str(dist))
+plt.imshow(nloop_image)
+plt.show()
+
+# distance_matrix = np.append(distance_matrix, np.array([(allFiles[i], dist)], dtype='S20, f4')) # append candidate names and distances into a matrix
 
 
 # for i in range(len(allFiles)): # fron 0 to len(allFiles)-1 --> search for all images in the database

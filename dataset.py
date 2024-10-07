@@ -178,7 +178,7 @@ class DataSet:
     def get_dbimage(self,theIndex):
         theIndex=theIndex%self.numDBImages
         dbFileName=os.path.join(self.dbImagesPath,self.dbImageFns[theIndex])
-        return imread(dbFileName)
+        return imread(dbFileName), dbFileName
 
     # Outputs the specified query image.
     # Input  : theIndex - Index of the query image to retrieve. The index is
@@ -189,7 +189,7 @@ class DataSet:
     def get_qimage(self,theIndex):
         theIndex=theIndex%self.numDBImages
         qFileName=os.path.join(self.qImagesPath,self.qImageFns[theIndex])
-        return imread(qFileName)
+        return imread(qFileName), qFileName
 
     # Outputs the indexes of the database images that close a loop with
     # the specified query image.
