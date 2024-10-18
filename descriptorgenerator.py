@@ -50,7 +50,7 @@ class HALOCGenerator:
                 dot_normalized = (dot + 1.0) / 2.0
                 suma = suma + dot_normalized
         
-        hash=np.append(hash, (suma/num_of_descriptors))   
+            hash=np.append(hash, (suma/num_of_descriptors))   
 
         for i in range(num_of_components):
             suma=0
@@ -59,7 +59,7 @@ class HALOCGenerator:
                 dot_normalized = (dot + 1.0) / 2.0
                 suma = suma + dot_normalized
         
-        hash=np.append(hash, (suma/num_of_descriptors))   
+            hash=np.append(hash, (suma/num_of_descriptors))   
 
 
         for i in range(num_of_components):
@@ -85,7 +85,7 @@ class HALOCGenerator:
         for i in range(long): # dot product between vector2 and vector 1 for the num_max_features-1 components
             const1=const1+(vector1[i]*vector2[i])
 
-        xn=-const1/vector1[num_max_features-1] # the last component of vector2 and the one that makes vector1·vector2=0
+        xn=-const1/vector1[num_max_features-1] # the last component of vector2 is the one that makes vector1·vector2=0
         vector2=np.append(vector2, xn) # add the last component to vector2. Now, vector 1 and vector 2 are orthogonals
 
         vector2 /= np.linalg.norm(vector2) # normalize vector2 again
@@ -119,13 +119,4 @@ class HALOCGenerator:
         vector3 /= np.linalg.norm(vector3) # normalize vector3
 
         #  print ("lengh of vector3: "+str(len(vector3)))
-        # just visualize some results
-        print("Orthogona projection vectors")
-        print("||v1|| = "+str(np.linalg.norm(vector1)))
-        print("||v1|| = "+str(np.linalg.norm(vector2)))
-        print("||v1|| = "+str(np.linalg.norm(vector3)))
-        print("\nv1.v2 = "+str(np.dot(vector1, vector2)))
-        print("v2.v3 = "+str(np.dot(vector2, vector3)))
-        print("v1.v3 = "+str(np.dot(vector1, vector3)))
-
         return vector1, vector2, vector3

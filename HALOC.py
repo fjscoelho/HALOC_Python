@@ -31,6 +31,15 @@ queryIndex= 5
 
 Haloc= HALOCGenerator(num_max_features); #create an Haloc object (define the orthogonal vectors to projections)
 
+# just visualize some results
+print("Orthogonal projection vectors")
+print("||v1|| = "+str(np.linalg.norm(Haloc.vector1)))
+print("||v2|| = "+str(np.linalg.norm(Haloc.vector2)))
+print("||v3|| = "+str(np.linalg.norm(Haloc.vector3)))
+print("\nv1.v2 = "+str(np.dot(Haloc.vector1, Haloc.vector2)))
+print("v2.v3 = "+str(np.dot(Haloc.vector2, Haloc.vector3)))
+print("v1.v3 = "+str(np.dot(Haloc.vector1, Haloc.vector3)))
+
 #select one query
 query_image, qFileName = dataSet1.get_qimage(queryIndex) # the global  path of the query image
 dataFields = qFileName.split('/')
@@ -73,6 +82,9 @@ print('l1-norm between '+ nlFileName +' and '+ qshortName + '= ' +str(dist))
 plt.imshow(nloop_image)
 plt.show()
 
+qHashs = np.zeros((dataSet1.numQImages,len(hash_query)))   # initialize array of hash for all dataset query images
+
+print('teste')
 # distance_matrix = np.append(distance_matrix, np.array([(allFiles[i], dist)], dtype='S20, f4')) # append candidate names and distances into a matrix
 
 
