@@ -17,6 +17,9 @@ import numpy as np # mathematic operations
 import os # utility for access to directories.
 from dataset import DataSet # import the Dataset management class 
 from descriptorgenerator import HALOCGenerator
+from scipy.spatial.distance import cdist
+from imagematcher import ImageMatcher
+import time
 
 #############################################################
 qPath='/home/fabio/NetHALOC/HALOC/HALOC_Python/DATASETS/QUERY/' # write here the global path of your queries
@@ -83,8 +86,75 @@ plt.imshow(nloop_image)
 plt.show()
 
 qHashs = np.zeros((dataSet1.numQImages,len(hash_query)))   # initialize array of hash for all dataset query images
+dbHashs = np.zeros((dataSet1.numDBImages,len(hash_query)))   # initialize array of hash for all dataset db images
 
-print('teste')
+print('COMPUTING ALL DATASET IMAGE HASHES')
+t_initial = time.time()
+for i in range(dataSet1.numQImages):
+    q_image, qFileName = dataSet1.get_qimage(i)      # get a query image
+    hash_qimage = Haloc.get_descriptors(qFileName) # get hash of candidate
+    qHashs[i] = hash_qimage
+
+for i in range(dataSet1.numDBImages):
+    db_image, dbFileName = dataSet1.get_dbimage(i)     # get a DB image
+    hash_candidate = Haloc.get_descriptors(dbFileName) # get hash of DB image
+    dbHashs[i] = hash_candidate
+t_hashes = time.time() - t_initial
+print('Time to compute '+ str(dataSet1.numQImages + dataSet1.numDBImages)+ ' image hashes = '+ str(t_hashes) + ' s')
+
+print('COMPUTING DISTANCES BETWEEN DESCRIPTORS')
+t_initial = time.time()
+distanceType = 'euclidean'
+# return a matrix (Returns a matrix of shape (m, p) where each element [i, j] is the distance between
+#  the ith query hash and the jth db hash.) 
+theDistances = cdist(qHashs,dbHashs,distanceType)
+t_distances = time.time() - t_initial
+print('Time to compute '+ str(dataSet1.numQImages*dataSet1.numDBImages)+ ' hash distances = '+ str(t_distances) + ' s')
+
+tp=tn=fp=fn=0
+nItems=5
+contaux = 0
+print('THE CLOSEST '+str(nItems)+' DATABASE IMAGES WILL BE SEARCHED')
+
+theMatcher = ImageMatcher()
+t_start = time.time()
+for qIndex in range(dataSet1.numQImages):
+    dbLoopCandidates = np.argsort(theDistances[qIndex,:])[:nItems] # get nItems with shortest distance to query
+    qImage, qFileName  = dataSet1.get_qimage(qIndex) # retrieve the query image
+    dbActualLoops = dataSet1.get_qloop(qIndex) # search for all dB images that contain a loop with the qIndex query
+    
+    for dbIndex in range(dataSet1.numDBImages): # For all database images
+        isLoop=dbIndex in dbActualLoops # See if the dBIndex is identical to the set of images that contain loops
+        foundLoop=False
+        if dbIndex in dbLoopCandidates: # If the DbIndex image is in the five 5 loop candidates
+            dbImage, dbFileName=dataSet1.get_dbimage(dbIndex)
+            theMatcher.define_images(qImage,dbImage)
+            foundLoop=theMatcher.estimate() # Verify if there is a loop closing RANSAC between query and dB
+            if isLoop:
+                contaux+=1
+            # foundLoop = True
+            del dbImage
+        if foundLoop and isLoop:
+            tp+=1   # estava dentro dos candidatos a loop e o RANSAC também confirmou
+        elif foundLoop and (not isLoop):
+            fp+=1   # o loop real não estava entre os candidatos e o RANSAC confirmou uma imagem erroneamente
+        elif (not foundLoop) and isLoop:
+            fn+=1   # é um loop real, mas não entrou nos candidatos e/ou o RANSAC não confirmou
+        elif (not foundLoop) and (not isLoop):
+            tn+=1
+    print('    + COMPLETED '+str(qIndex+1)+' OF '+str(dataSet1.numQImages)+' QUERIES')
+    del qImage
+
+tloops=time.time()-t_start
+print('TESTS FINISHED')
+theAccuracy=(tp+tn)/(tp+tn+fp+fn)
+theTPR=tp/(tp+fn)
+theFPR=fp/(fp+tn)
+print('Loops perdidos pelo RANSAC = ' +str(contaux - tp)) # Quantos vezes uma imagem que forma loop estava entre os cadidatos
+# e o RANSAC não confirmou
+print('[TP, FP, FN, TN '+str(tp)+' '+str(fp)+' '+str(fn)+' '+str(tn)+']')
+print('[FULLSTATS COMPUTED '+str(theAccuracy)+' '+str(theTPR)+' '+str(theFPR)+' '+str(tloops)+']')
+
 # distance_matrix = np.append(distance_matrix, np.array([(allFiles[i], dist)], dtype='S20, f4')) # append candidate names and distances into a matrix
 
 
