@@ -28,7 +28,7 @@ dBPath='/home/fabio/NetHALOC/HALOC/HALOC_Python/DATASETS/DATABASE/' # write here
 print('********** LOADING DATASET ***********')
 dataSet1=DataSet('DATASETS/DATASET1.TXT')
 
-num_max_features = 100 # define the maximum number of features
+num_max_features = 50 # define the maximum number of features
 imgSize = (240,320)    # define size images
 queryIndex= 5
 
@@ -51,7 +51,7 @@ plt.imshow(query_image)
 plt.title('QUERY')
 plt.show()
 
-hash_query = Haloc.get_descriptors(qFileName) # get the query hash
+hash_query = Haloc.get_descriptors(qFileName,True) # get the query hash
 
 # allFiles=[x for x in os.listdir(dBPath) if x.upper().endswith('.JPG')] ## list of images of the db directory. Assume that all are JPG, change if they are png or others
 
@@ -79,7 +79,7 @@ nLoopIndex = 12
 plt.figure()
 plt.title('NOT LOOP')
 nloop_image, nlFileName = dataSet1.get_dbimage(nLoopIndex)
-hash_nloop = Haloc.get_descriptors(nlFileName) # get the query hash
+hash_nloop = Haloc.get_descriptors(nlFileName, True) # get the query hash
 dist = np.linalg.norm((hash_nloop-hash_query), ord=1) # compute l1 norm between hashes
 print('l1-norm between '+ nlFileName +' and '+ qshortName + '= ' +str(dist))
 plt.imshow(nloop_image)

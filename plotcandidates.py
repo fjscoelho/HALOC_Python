@@ -31,7 +31,7 @@ dBPath='/home/fabio/NetHALOC/HALOC/HALOC_Python/DATASETS/DATABASE/' # write here
 print('********** LOADING DATASET ***********')
 dataSet1=DataSet('DATASETS/DATASET1.TXT')
 
-num_max_features = 500 # define the maximum number of features
+num_max_features = 50 # define the maximum number of features
 imgSize = (240,320)    # define size images
 queryIndex= 5
 
@@ -70,7 +70,7 @@ print('Time to compute '+ str(dataSet1.numQImages + dataSet1.numDBImages)+ ' ima
 
 print('COMPUTING DISTANCES BETWEEN DESCRIPTORS')
 t_initial = time.time()
-distanceType = 'euclidean'
+distanceType = 'cityblock' # cityblock = Manhattan (L1 - norm)
 
 # return a matrix (Returns a matrix of shape (m, p) where each element [i, j] is the distance between
 #  the ith query hash and the jth db hash.) 

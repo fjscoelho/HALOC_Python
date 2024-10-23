@@ -1,6 +1,8 @@
 import numpy as np
 import cv2 # import open CV for image processing: SIFT features
 import numpy as np # mathematic operations
+import matplotlib.pyplot as plt
+from skimage.io import imread
 
 class HALOCGenerator:
     def __init__(self, num_max_features=100):
@@ -12,32 +14,42 @@ class HALOCGenerator:
         self.vector2=vector2
         self.vector3=vector3
 
-    def get_descriptors(self, theImage):
-        gsImage=cv2.imread(theImage,cv2.IMREAD_GRAYSCALE) # read the image "theImage" from the hard disc in gray scale and loads it as a OpenCV CvMat structure. 
-    
-        # gsImage=cv2.cvtColor(curImage,cv2.COLOR_BGR2GRAY) # convert image to gray scale
-        # plt.figure()
-        # plt.imshow(gsImage) # shows image
-        # plt.show()
-        theSIFT=cv2.SIFT_create((self.num_max_features-3)) # creates a object type SIFT 
+    def get_descriptors(self, theImage, debug = False):
+        curImage = cv2.imread(theImage, cv2.IMREAD_COLOR) # read the image "theImage" from the hard disc in gray scale and loads it as a OpenCV CvMat structure. 
+        gsImage = cv2.cvtColor(curImage,cv2.COLOR_BGR2GRAY) # convert image to gray scale
+
+         # creates a object type SIFT 
+        theSIFT=cv2.SIFT_create((self.num_max_features-3)) # sometimes the number of Keypoints is larger than num_max_features
         keyPoints,theDescriptors=theSIFT.detectAndCompute(gsImage,None) # keypoint detection and descriptors descriptors, sense mascara
-        img = cv2.drawKeypoints(gsImage,keyPoints,None,flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS) # uncomment in case you want to see the keypoints
-        # plt.figure()
-        # plt.imshow(img)
-        # plt.show()
+        
+        # sanity checks:
         nbr_of_keypoints=len(keyPoints)
-        # sanity checks: 
         if nbr_of_keypoints==0:
             print("ERROR: descriptor Matrix is Empty")
             return 
         if nbr_of_keypoints>len(self.vector1):
             print("ERROR:  The number of descriptors is larger than the size of the projection vector. This should not happen.")
             return
-
+        
+        if debug:
+            img = cv2.drawKeypoints(gsImage,keyPoints,None,flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS) # uncomment in case you want to see the keypoints
+            plt.figure()
+            plt.subplot(1,2,1)
+            plt.imshow(curImage) # shows image
+            plt.title("cv2 color image")
+            # plt.show()
+            plt.subplot(1,2,2)
+            plt.imshow(img)
+            plt.title("nº keypoints = "+ str(nbr_of_keypoints))
+            plt.show()
+        
         num_of_descriptors=theDescriptors.shape[0] #--> 100
         num_of_components=theDescriptors.shape[1] # --> 128
         hash=[] # initilize hash
 
+        if debug:
+            print("Nº de descritores = "+ str(num_of_descriptors))
+            print("Nº de componentes = "+ str(num_of_components))
         # initialize auxiliar variables
         dot = 0
         dot_normalized=0
