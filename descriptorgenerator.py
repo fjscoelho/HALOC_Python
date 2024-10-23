@@ -3,10 +3,10 @@ import cv2 # import open CV for image processing: SIFT features
 import numpy as np # mathematic operations
 
 class HALOCGenerator:
-    def __init__(self, imgSize=(240,320), num_max_features=100):
+    def __init__(self, num_max_features=100):
         # Compute the orthogonal projection vectors (Once computed are the same for all the process)
         vector1,vector2,vector3=self.__calculatevectors__(num_max_features)
-        self.imgSize = imgSize
+        # self.imgSize = imgSize
         self.num_max_features = num_max_features
         self.vector1=vector1
         self.vector2=vector2
