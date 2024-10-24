@@ -28,20 +28,14 @@ dBPath='/home/fabio/NetHALOC/HALOC/HALOC_Python/DATASETS/DATABASE/' # write here
 print('********** LOADING DATASET ***********')
 dataSet1=DataSet('DATASETS/DATASET1.TXT')
 
-num_max_features = 50 # define the maximum number of features
+num_max_features = 100 # define the maximum number of features
 imgSize = (240,320)    # define size images
 queryIndex= 5
+k = 3                  # number of projection directions
+QRdebug = True
 
-Haloc= HALOCGenerator(num_max_features); #create an Haloc object (define the orthogonal vectors to projections)
+Haloc= HALOCGenerator(num_max_features, k, QRdebug); #create an Haloc object (define the orthogonal vectors to projections)
 
-# just visualize some results
-print("Orthogonal projection vectors")
-print("||v1|| = "+str(np.linalg.norm(Haloc.vector1)))
-print("||v2|| = "+str(np.linalg.norm(Haloc.vector2)))
-print("||v3|| = "+str(np.linalg.norm(Haloc.vector3)))
-print("\nv1.v2 = "+str(np.dot(Haloc.vector1, Haloc.vector2)))
-print("v2.v3 = "+str(np.dot(Haloc.vector2, Haloc.vector3)))
-print("v1.v3 = "+str(np.dot(Haloc.vector1, Haloc.vector3)))
 
 #select one query
 query_image, qFileName = dataSet1.get_qimage(queryIndex) # the global  path of the query image
@@ -60,30 +54,35 @@ actualLoops=dataSet1.get_qloop(queryIndex)
 distance_matrix=np.zeros((0,2),dtype='S20, f4')
 
 plt.figure()
-plt.title('ACTUAL LOOPS')
+for i in range(len(actualLoops)):
+    loop_image, lFileName = dataSet1.get_dbimage(actualLoops[i])
+    plt.subplot(1,2,i+1)
+    plt.imshow(loop_image)
+    plt.title('ACTUAL LOOPS')
+plt.show()
+
+
 print("\n Distances:")
 for i in range(len(actualLoops)):
     loop_image, lFileName = dataSet1.get_dbimage(actualLoops[i])
-    hash_loop = Haloc.get_descriptors(lFileName) # get the query hash
+    hash_loop = Haloc.get_descriptors(lFileName, True) # get the query hash
     dist = np.linalg.norm((hash_loop-hash_query), ord=1) # compute l1 norm between hashes
     dataFields = lFileName.split('/')
     lshortName = dataFields[-1]
     distance_matrix = np.append(distance_matrix, np.array([(lshortName, dist)], dtype='S20, f4'))
-    plt.subplot(1,2,i+1)
-    plt.imshow(loop_image)
-    print('l1-norm between '+ lFileName +' and '+ qshortName + '= ' +str(dist))
-plt.show()
+    print('Loop: l1-norm between '+ lFileName +' and '+ qshortName + '= ' +str(dist))
+
 
 nLoopIndex = 12
 
 plt.figure()
-plt.title('NOT LOOP')
 nloop_image, nlFileName = dataSet1.get_dbimage(nLoopIndex)
+plt.imshow(nloop_image)
+plt.title('NOT LOOP')
+plt.show()
 hash_nloop = Haloc.get_descriptors(nlFileName, True) # get the query hash
 dist = np.linalg.norm((hash_nloop-hash_query), ord=1) # compute l1 norm between hashes
-print('l1-norm between '+ nlFileName +' and '+ qshortName + '= ' +str(dist))
-plt.imshow(nloop_image)
-plt.show()
+print('No loop: l1-norm between '+ nlFileName +' and '+ qshortName + '= ' +str(dist))
 
 qHashs = np.zeros((dataSet1.numQImages,len(hash_query)))   # initialize array of hash for all dataset query images
 dbHashs = np.zeros((dataSet1.numDBImages,len(hash_query)))   # initialize array of hash for all dataset db images

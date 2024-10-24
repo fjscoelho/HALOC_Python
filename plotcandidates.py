@@ -23,6 +23,7 @@ import time
 
 # change this flag to True if you ant to plot the loop candidates
 debugPlot = False
+QRdebug = True
 
 #############################################################
 qPath='/home/fabio/NetHALOC/HALOC/HALOC_Python/DATASETS/QUERY/' # write here the global path of your queries
@@ -31,24 +32,16 @@ dBPath='/home/fabio/NetHALOC/HALOC/HALOC_Python/DATASETS/DATABASE/' # write here
 print('********** LOADING DATASET ***********')
 dataSet1=DataSet('DATASETS/DATASET1.TXT')
 
-num_max_features = 50 # define the maximum number of features
+num_max_features = 100 # define the maximum number of features
 imgSize = (240,320)    # define size images
 queryIndex= 5
+k = 3                  # number of projection directions
 
-Haloc= HALOCGenerator(num_max_features); #create an Haloc object (define the orthogonal vectors to projections)
-
-# just visualize some results
-print("Orthogonal projection vectors")
-print("||v1|| = "+str(np.linalg.norm(Haloc.vector1)))
-print("||v2|| = "+str(np.linalg.norm(Haloc.vector2)))
-print("||v3|| = "+str(np.linalg.norm(Haloc.vector3)))
-print("\nv1.v2 = "+str(np.dot(Haloc.vector1, Haloc.vector2)))
-print("v2.v3 = "+str(np.dot(Haloc.vector2, Haloc.vector3)))
-print("v1.v3 = "+str(np.dot(Haloc.vector1, Haloc.vector3)))
+Haloc= HALOCGenerator(num_max_features, k, QRdebug); #create an Haloc object (define the orthogonal vectors to projections)
 
 #select one query
 query_image, qFileName = dataSet1.get_qimage(queryIndex) # the global  path of the query image
-hash_query = Haloc.get_descriptors(qFileName) # get the query hash
+hash_query = Haloc.get_descriptors(qFileName, True) # get the query hash
 
 
 qHashs = np.zeros((dataSet1.numQImages,len(hash_query)))   # initialize array of hash for all dataset query images
