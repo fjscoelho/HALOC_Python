@@ -30,6 +30,7 @@
 
 import os
 from skimage.io import imread
+import numpy as np
 
 class DataSet:
     
@@ -101,11 +102,13 @@ class DataSet:
         dbIndex= 0
         qIndex= 0
         for curFile in self.dbImageFns:
-            print('  - '+curFile + ': Shape = ' + str(self.get_dbimage(dbIndex).shape))
+            db_image, dbFileName = self.get_dbimage(dbIndex)
+            print('  - '+curFile + ': Shape = ' + str(db_image.shape))
             dbIndex +=1 
         print('QUERY FILES:')
         for curFile in self.qImageFns:
-            print('  - '+curFile + ': Shape = ' + str(self.get_qimage(qIndex).shape))
+            q_image, qFileName = self.get_dbimage(dbIndex)
+            print('  - '+curFile + ': Shape = ' + str(q_image.shape))
             qIndex+=1 
         print('LOOPS:')
         for curLoop in self.theLoops:

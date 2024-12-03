@@ -20,6 +20,7 @@ for i in range(k):
 # Verify the dot products between columns
 for i in range(k):
     for j in range(i+1,k):
-        print("dot product: q"+str(i+1)+"q"+str(j+1)+" = "+str(np.dot(Q[:,i],Q[:,j])))
+        print("dot product: q"+str(i+1)+"q"+str(j+1)+" \
+              = "+str(np.dot(Q[:,i],Q[:,j])))
 
 

@@ -1,15 +1,3 @@
-####################################################################################################################################################################################
-# Author	: Francisco Bonin Font
-# History     : 27-June-2019 - Creation
-# NOTES:
-#	1. This code runs fine with python 3.7.3. inside an Anaconda environment (https://www.anaconda.com/distribution/?gclid=EAIaIQobChMImM39x9Ow5gIVhYxRCh3CXgvnEAAYASAAEgI91vD_BwE). 
-# 	2. Not tested on other versions of python.
-# 	3. You will need to install OpenCv for python: pip install opencv-python 
-# 	4. Take into account that , if you are using Jupyter Notebook, it is necessary to run, first: import sys
-# 	5.if you have installed ROS (Robot Operating System) Kinetic or any other ROS distribution, first you will need to deactivate the Python lybraries installed with ROS:  
-# 			sys.path.remove('/opt/ros/kinetic/lib/python2.7/dist-packages')
-#####################################################################################################################################################################################
-
 
 import matplotlib.pyplot as plt
 import cv2 # import open CV for image processing: SIFT features
@@ -26,23 +14,28 @@ debugPlot = False
 QRdebug = True
 
 #############################################################
-qPath='/home/fabio/NetHALOC/HALOC/HALOC_Python/DATASETS/QUERY/' # write here the global path of your queries
-dBPath='/home/fabio/NetHALOC/HALOC/HALOC_Python/DATASETS/DATABASE/' # write here the global path of the corresponding database of images
 
 print('********** LOADING DATASET ***********')
-dataSet1=DataSet('DATASETS/DATASET1.TXT')
+dataSet1=DataSet('DATASETS/DATASET_LABCON.TXT')
 
-num_max_features = 100 # define the maximum number of features
-imgSize = (240,320)    # define size images
-queryIndex= 5
+queryIndex= 0
 k = 3                  # number of projection directions
-
-Haloc= HALOCGenerator(num_max_features, k, QRdebug); #create an Haloc object (define the orthogonal vectors to projections)
 
 #select one query
 query_image, qFileName = dataSet1.get_qimage(queryIndex) # the global  path of the query image
+shape = query_image.shape
+size = shape[0]*shape[1]
+num_max_features = 0.05*size # define the maximum number of features = 5% of length in pixels
+num_max_features = 100
+print('num_max_features = '+ str(num_max_features))
+
+Haloc= HALOCGenerator(num_max_features, k, QRdebug); #create an Haloc object (define the orthogonal vectors to projections)
+
+
 hash_query = Haloc.get_descriptors(qFileName, True) # get the query hash
 
+n = dataSet1.numQImages
+l = len(hash_query)
 
 qHashs = np.zeros((dataSet1.numQImages,len(hash_query)))   # initialize array of hash for all dataset query images
 dbHashs = np.zeros((dataSet1.numDBImages,len(hash_query)))   # initialize array of hash for all dataset db images

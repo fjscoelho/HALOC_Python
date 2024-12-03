@@ -53,8 +53,19 @@ class HALOCGenerator:
         dot = 0
         dot_normalized=0
         suma = 0
+        
+        # for j in range(num_of_components):
+        #     # print("Antes da normalização:")
+        #         # print(theDescriptors[:,i])
+        #         # print("Norma = "+str(np.linalg.norm(theDescriptors[:,i])))
+                
+        #         theDescriptors[:,j] = theDescriptors[:,j]/np.linalg.norm(theDescriptors[:,j])
 
-        for l in range(self.k):
+        #         # print("Antes da normalização:")
+        #         # print(theDescriptors[:,i])
+        #         # print("Norma = "+str(np.linalg.norm(theDescriptors[:,i])))
+
+        for l in range(self.k): # for each ul projection vector
             for i in range(num_of_components):
                 suma=0
                 for j in range(num_of_descriptors):
