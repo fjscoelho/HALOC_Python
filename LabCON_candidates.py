@@ -7,6 +7,7 @@ from dataset import DataSet # import the Dataset management class
 from descriptorgenerator import HALOCGenerator
 from scipy.spatial.distance import cdist
 from imagematcher import ImageMatcher
+from skimage.transform import resize
 import time
 
 # change this flag to True if you ant to plot the loop candidates
@@ -26,7 +27,7 @@ query_image, qFileName = dataSet1.get_qimage(queryIndex) # the global  path of t
 shape = query_image.shape
 size = shape[0]*shape[1]
 num_max_features = 0.05*size # define the maximum number of features = 5% of length in pixels
-num_max_features = 100
+num_max_features = 300
 print('num_max_features = '+ str(num_max_features))
 
 Haloc= HALOCGenerator(num_max_features, k, QRdebug); #create an Haloc object (define the orthogonal vectors to projections)
@@ -61,6 +62,8 @@ distanceType = 'cityblock' # cityblock = Manhattan (L1 - norm)
 # return a matrix (Returns a matrix of shape (m, p) where each element [i, j] is the distance between
 #  the ith query hash and the jth db hash.) 
 theDistances = cdist(qHashs,dbHashs,distanceType)
+# print('Distancias:')
+# print(theDistances)
 t_distances = time.time() - t_initial
 print('Time to compute '+ str(dataSet1.numQImages*dataSet1.numDBImages)+ ' hash distances = '+ str(t_distances) + ' s')
 
@@ -75,8 +78,10 @@ for qIndex in range(dataSet1.numQImages):
     qImage, qFileName  = dataSet1.get_qimage(qIndex) # retrieve the query image
     dbActualLoops = dataSet1.get_qloop(qIndex) # search for all dB images that contain a loop with the qIndex query
 
+    
     # count the actual loops found in candidates
     for i in range(len(dbLoopCandidates)):
+
         if dbLoopCandidates[i] in dbActualLoops:
             findloop +=1
 
@@ -86,15 +91,21 @@ for qIndex in range(dataSet1.numQImages):
         plt.figure(2*qIndex+1)
         plt.subplot(2,3,1)
         # Plot the query
-        plt.imshow(qImage)
+        plt.imshow(resize(qImage, (240, 320), anti_aliasing=True))
         plt.title('QUERY: (i = '+str(qIndex)+') '+qFileName)
         # Plot each of the selected database images
+        print('QUERY: (i = '+str(qIndex)+') '+qFileName)
         for i in range(5):
             plt.subplot(2,3,i+2)
             dbImage, dbFileName = dataSet1.get_dbimage(dbLoopCandidates[i])
-            plt.imshow(dbImage)
+            resized_image = resize(dbImage, (240, 320), anti_aliasing=True)
+            plt.imshow(resized_image)
             # If the image is an actual loop (a true positive), show the message
             # "ACTUAL LOOP".
+            
+            # Verify the distance between query and the loops candidates
+            print('(i = '+str(dbLoopCandidates[i])+') '+dbFileName+': norm = '+str(theDistances[qIndex,dbLoopCandidates[i]]))
+
             if dbLoopCandidates[i] in dbActualLoops:
                 plt.title('ACTUAL LOOP: (i = '+str(dbLoopCandidates[i])+') '+dbFileName)
         plt.show()
@@ -103,11 +114,12 @@ for qIndex in range(dataSet1.numQImages):
         plt.figure(2*qIndex+2)
         plt.subplot(2,3,1)
         plt.title('QUERY: (i = '+str(qIndex)+') '+qFileName)
-        plt.imshow(qImage)
+        plt.imshow(resize(qImage, (240, 320), anti_aliasing=True))
         for i in range(len(dbActualLoops)):
             plt.subplot(2,3,i+2)
             dbImage, dbFileName = dataSet1.get_dbimage(dbActualLoops[i])
-            plt.imshow(dbImage)
+            resized_image = resize(dbImage, (240, 320), anti_aliasing=True)
+            plt.imshow(resized_image)
             plt.title('ACTUAL LOOP: (i = '+str(dbActualLoops[i])+') '+dbFileName)
         plt.show()
 

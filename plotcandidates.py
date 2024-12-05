@@ -35,7 +35,7 @@ dataSet1=DataSet('DATASETS/DATASET1.TXT')
 num_max_features = 100 # define the maximum number of features
 imgSize = (240,320)    # define size images
 queryIndex= 5
-k = 3                  # number of projection directions
+k = 5                  # number of projection directions
 
 Haloc= HALOCGenerator(num_max_features, k, QRdebug); #create an Haloc object (define the orthogonal vectors to projections)
 

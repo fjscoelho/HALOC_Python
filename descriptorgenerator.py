@@ -15,7 +15,8 @@ class HALOCGenerator:
 
     def get_descriptors(self, theImage, debug = False):
         curImage = cv2.imread(theImage, cv2.IMREAD_COLOR) # read the image "theImage" from the hard disc in gray scale and loads it as a OpenCV CvMat structure. 
-        gsImage = cv2.cvtColor(curImage,cv2.COLOR_BGR2GRAY) # convert image to gray scale
+        resized_image = cv2.resize(curImage, (320, 240), interpolation=cv2.INTER_AREA)
+        gsImage = cv2.cvtColor(resized_image,cv2.COLOR_BGR2GRAY) # convert image to gray scale
 
          # creates a object type SIFT 
         theSIFT=cv2.SIFT_create((self.num_max_features-3)) # sometimes the number of Keypoints is larger than num_max_features
